@@ -56,7 +56,6 @@ exports.install = function (Vue) {
     data () {
       return {
         chart: null,
-        error: { onError: false, message: '' },
         noData: false,
         message: '',
       }
@@ -76,15 +75,12 @@ exports.install = function (Vue) {
       clear () {
         this.noData = false
         this.message = ''
-        if (this.error.onError) {
-          this.error = { onError: false, message: '' }
-        }
       },
       draw () {
-        if (this.haveNoData()) {
-          return this.setNoData()
-        }
         this.clear()
+        if (this.haveNoData()) {
+          this.setNoData()
+        }
         this.chart = new this.$chartist[this.type](this.$refs.chart, this.data, this.options, this.responsiveOptions)
         this.setEventHandlers()
       },
@@ -103,13 +99,11 @@ exports.install = function (Vue) {
           )
       },
       redraw () {
-        if (this.error.onError) {
-          return this.draw()
-        } else if (this.haveNoData()) {
-          return this.setNoData()
-        }
         this.clear()
         this.chart.update(this.data, this.options, false, this.responsiveOptions)
+        if (this.haveNoData()) {
+          this.setNoData()
+        }
       },
       resetEventHandlers (eventHandlers, oldEventHandler) {
         if (!this.chart) {
@@ -130,9 +124,8 @@ exports.install = function (Vue) {
         }
       },
       setNoData () {
-        this.error = { onError: true, message: this.noDataOptions.message }
         this.noData = true
-        this.message = this.error.message
+        this.message = this.noDataOptions.message
       }
     },
     render (h) {
